@@ -1,8 +1,6 @@
 {
   "linterOptions": {
-    "exclude": [
-      "**/*.spec.ts"
-    ]
+    "exclude": ["**/*.spec.ts"]
   },
   "defaultSeverity": "error",
   "extends": ["tslint:recommended"],
@@ -21,40 +19,44 @@
     "adjacent-overload-signatures": true,
     "arrow-return-shorthand": true,
     "ban-ts-ignore": true,
-    "ban-types": [true,
-      ["Object", "Avoid using the `Object` type. Did you mean `object`?"],
-      ["Boolean", "Avoid using the `Boolean` type. Did you mean `boolean`?"],
-      ["Number", "Avoid using the `Number` type. Did you mean `number`?"],
-      ["String", "Avoid using the `String` type. Did you mean `string`?"],
-      ["Symbol", "Avoid using the `Symbol` type. Did you mean `symbol`?"]
+    "ban-types": [
+      true,
+      [
+        "Object",
+        "Avoid using the `Object` type. Did you mean `object`?"
+      ],
+      [
+        "Boolean",
+        "Avoid using the `Boolean` type. Did you mean `boolean`?"
+      ],
+      [
+        "Number",
+        "Avoid using the `Number` type. Did you mean `number`?"
+      ],
+      [
+        "String",
+        "Avoid using the `String` type. Did you mean `string`?"
+      ],
+      [
+        "Symbol",
+        "Avoid using the `Symbol` type. Did you mean `symbol`?"
+      ]
     ],
     "callable-types": true,
     "class-name": true,
-    "comment-format": [
-      true,
-      "check-space"
-    ],
+    "comment-format": [true, "check-space"],
     "curly": true,
     "deprecation": {
       "severity": "warn"
     },
     "eofline": true,
     "forin": true,
-    "import-blacklist": [
-      true,
-      "rxjs/Rx"
-    ],
+    "import-blacklist": [true, "rxjs/Rx"],
     "import-spacing": true,
-    "indent": [
-      true,
-      "spaces"
-    ],
+    "indent": [true, "spaces"],
     "interface-over-type-literal": true,
     "label-position": true,
-    "max-line-length": [
-      true,
-      160
-    ],
+    "max-line-length": [true, 160],
     "member-access": [true, "no-public"],
     "member-ordering": [
       true,
@@ -70,32 +72,20 @@
     "no-any": false,
     "no-arg": true,
     "no-bitwise": true,
-    "no-console": [
-      true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
-    ],
+    "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
     "no-construct": true,
     "no-debugger": true,
     "no-duplicate-super": true,
     "no-empty": [true],
     "no-empty-interface": true,
     "no-eval": true,
-    "no-inferrable-types": [
-      true
-    ],
+    "no-inferrable-types": [true],
     "no-internal-module": true,
-    "no-input-rename": true,
     "no-magic-numbers": true,
     "no-misused-new": true,
     "no-namespace": true,
     "no-non-null-assertion": true,
     "no-parameter-reassignment": true,
-    "no-output-rename": true,
-    "no-output-on-prefix": true,
     "no-reference": true,
     "no-redundant-jsdoc": true,
     "no-shadowed-variable": true,
@@ -111,6 +101,7 @@
     "no-tautology-expression": true,
     "no-trailing-whitespace": true,
     "no-this-assignment": true,
+    "trailing-comma": false,
     "no-unnecessary-initializer": true,
     "no-unnecessary-type-assertion": true,
     "no-unused-expression": [true, "allow-fast-null-checks"],
@@ -124,28 +115,15 @@
       "check-else",
       "check-whitespace"
     ],
-    "only-arrow-functions": [
-      true,
-      "allow-declarations"
-    ],
+    "only-arrow-functions": [true, "allow-declarations"],
     "prefer-const": true,
     "prefer-for-of": true,
     "prefer-readonly": true,
     "promise-function-async": true,
-    "quotemark": [
-      true,
-      "single"
-    ],
+    "quotemark": [true, "single"],
     "radix": true,
-    "semicolon": [
-      true,
-      "always",
-      "ignore-bound-class-methods"
-    ],
-    "triple-equals": [
-      true,
-      "allow-null-check"
-    ],
+    "semicolon": [true, "always", "ignore-bound-class-methods"],
+    "triple-equals": [true, "allow-null-check"],
     "typedef-whitespace": [
       true,
       {
@@ -165,14 +143,7 @@
       "check-operator",
       "check-separator",
       "check-type"
-    ],
-    "use-input-property-decorator": true,
-    "use-output-property-decorator": true,
-    "use-host-property-decorator": true,
-    "use-life-cycle-interface": true,
-    "use-pipe-transform-interface": true,
-    "component-class-suffix": true,
-    "directive-class-suffix": true
+    ]
   },
   "rulesDirectory": []
 }

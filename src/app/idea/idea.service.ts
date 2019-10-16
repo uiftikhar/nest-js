@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class IdeaService {
   constructor(
     @InjectRepository(IdeaEntity)
-    private readonly ideaRepository: Repository<IdeaEntity>,
+    private readonly ideaRepository: Repository<IdeaEntity>
   ) {}
 
   async showAll() {
