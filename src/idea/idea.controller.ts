@@ -13,7 +13,6 @@ export class IdeaController {
 
   @Post()
   createIdea(@Body() data: IdeaDto) {
-    console.log(1, data, data.description, data.idea);
     return this.ideaService.create(data);
   }
 

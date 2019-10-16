@@ -18,8 +18,6 @@ export class IdeaService {
 
   async create(data: IdeaDto) {
     const idea = await this.ideaRepository.create(data);
-    console.log(`data: ${data}`);
-    console.log(idea.idea);
     await this.ideaRepository.save(idea);
     return idea;
   }
