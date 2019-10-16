@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 
 import { IdeaDto } from './idea.dto';
@@ -23,18 +27,49 @@ export class IdeaService {
   }
 
   async readIdea(id: string) {
-    return await this.ideaRepository.findOne({ where: { id } });
+    try {
+      const idea = await this.ideaRepository.findOneOrFail({
+        where: { id },
+      });
+      return idea;
+    } catch (exception) {
+      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+    }
   }
 
   async update(id: string, data: Partial<IdeaDto>) {
-    await this.ideaRepository.update({ id }, data);
-    return await this.ideaRepository.findOne({ id });
+    let idea;
+    let update;
+    try {
+      idea = await this.ideaRepository.findOne({
+        where: { id },
+      });
+      update = await this.ideaRepository.update({ id }, data);
+      return { ...idea, ...data };
+    } catch (e) {
+      if (!idea) {
+        throw new HttpException(
+          'Not Found: Could not find item to update',
+          HttpStatus.NOT_FOUND
+        );
+      }
+      if (!update) {
+        throw new HttpException(
+          'Error performing update',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
   }
 
   async destroy(id: string) {
-    await this.ideaRepository.delete({ id });
-    return {
-      deleted: true,
-    };
+    try {
+      await this.ideaRepository.delete({ id });
+      return {
+        deleted: true,
+      };
+    } catch (e) {
+      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+    }
   }
 }
