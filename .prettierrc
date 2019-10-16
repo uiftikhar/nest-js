@@ -1,4 +1,16 @@
 {
   "singleQuote": true,
-  "trailingComma": "all"
+  "trailingComma": "es5",
+  "bracketSpacing": true,
+  "printWidth": 160,
+  "arrowParens": "avoid",
+  "jsxBracketSameLine": true,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "printWidth": 100
+      }
+    }
+  ]
 }

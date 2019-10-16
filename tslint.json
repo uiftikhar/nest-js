@@ -1,4 +1,9 @@
 {
+  "linterOptions": {
+    "exclude": [
+      "**/*.spec.ts"
+    ]
+  },
   "defaultSeverity": "error",
   "extends": ["tslint:recommended"],
   "jsRules": {
@@ -12,7 +17,162 @@
     "member-ordering": [false],
     "interface-name": [false],
     "arrow-parens": false,
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "adjacent-overload-signatures": true,
+    "arrow-return-shorthand": true,
+    "ban-ts-ignore": true,
+    "ban-types": [true,
+      ["Object", "Avoid using the `Object` type. Did you mean `object`?"],
+      ["Boolean", "Avoid using the `Boolean` type. Did you mean `boolean`?"],
+      ["Number", "Avoid using the `Number` type. Did you mean `number`?"],
+      ["String", "Avoid using the `String` type. Did you mean `string`?"],
+      ["Symbol", "Avoid using the `Symbol` type. Did you mean `symbol`?"]
+    ],
+    "callable-types": true,
+    "class-name": true,
+    "comment-format": [
+      true,
+      "check-space"
+    ],
+    "curly": true,
+    "deprecation": {
+      "severity": "warn"
+    },
+    "eofline": true,
+    "forin": true,
+    "import-blacklist": [
+      true,
+      "rxjs/Rx"
+    ],
+    "import-spacing": true,
+    "indent": [
+      true,
+      "spaces"
+    ],
+    "interface-over-type-literal": true,
+    "label-position": true,
+    "max-line-length": [
+      true,
+      160
+    ],
+    "member-access": [true, "no-public"],
+    "member-ordering": [
+      true,
+      {
+        "order": [
+          "static-field",
+          "instance-field",
+          "static-method",
+          "instance-method"
+        ]
+      }
+    ],
+    "no-any": false,
+    "no-arg": true,
+    "no-bitwise": true,
+    "no-console": [
+      true,
+      "debug",
+      "info",
+      "time",
+      "timeEnd",
+      "trace"
+    ],
+    "no-construct": true,
+    "no-debugger": true,
+    "no-duplicate-super": true,
+    "no-empty": [true],
+    "no-empty-interface": true,
+    "no-eval": true,
+    "no-inferrable-types": [
+      true
+    ],
+    "no-internal-module": true,
+    "no-input-rename": true,
+    "no-magic-numbers": true,
+    "no-misused-new": true,
+    "no-namespace": true,
+    "no-non-null-assertion": true,
+    "no-parameter-reassignment": true,
+    "no-output-rename": true,
+    "no-output-on-prefix": true,
+    "no-reference": true,
+    "no-redundant-jsdoc": true,
+    "no-shadowed-variable": true,
+    "no-string-literal": true,
+    "no-string-throw": true,
+    "no-switch-case-fall-through": true,
+    "no-submodule-imports": [
+      true,
+      "rxjs",
+      "rxjs/operators",
+      "dotenv"
+    ],
+    "no-tautology-expression": true,
+    "no-trailing-whitespace": true,
+    "no-this-assignment": true,
+    "no-unnecessary-initializer": true,
+    "no-unnecessary-type-assertion": true,
+    "no-unused-expression": [true, "allow-fast-null-checks"],
+    "no-var-keyword": true,
+    "no-var-requires": true,
+    "object-literal-sort-keys": false,
+    "one-line": [
+      true,
+      "check-open-brace",
+      "check-catch",
+      "check-else",
+      "check-whitespace"
+    ],
+    "only-arrow-functions": [
+      true,
+      "allow-declarations"
+    ],
+    "prefer-const": true,
+    "prefer-for-of": true,
+    "prefer-readonly": true,
+    "promise-function-async": true,
+    "quotemark": [
+      true,
+      "single"
+    ],
+    "radix": true,
+    "semicolon": [
+      true,
+      "always",
+      "ignore-bound-class-methods"
+    ],
+    "triple-equals": [
+      true,
+      "allow-null-check"
+    ],
+    "typedef-whitespace": [
+      true,
+      {
+        "call-signature": "nospace",
+        "index-signature": "nospace",
+        "parameter": "nospace",
+        "property-declaration": "nospace",
+        "variable-declaration": "nospace"
+      }
+    ],
+    "unified-signatures": true,
+    "variable-name": [true, "allow-leading-underscore"],
+    "whitespace": [
+      true,
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-separator",
+      "check-type"
+    ],
+    "use-input-property-decorator": true,
+    "use-output-property-decorator": true,
+    "use-host-property-decorator": true,
+    "use-life-cycle-interface": true,
+    "use-pipe-transform-interface": true,
+    "component-class-suffix": true,
+    "directive-class-suffix": true
   },
   "rulesDirectory": []
 }

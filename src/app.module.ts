@@ -5,6 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { CatsModule } from './cats/cats.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { IdeaModule } from './idea/idea.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     // }),
     // MongooseModule.forRoot('mongodb://localhost/nest'),
     TypeOrmModule.forRoot(),
+    IdeaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
