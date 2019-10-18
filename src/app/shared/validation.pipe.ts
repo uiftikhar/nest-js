@@ -9,7 +9,7 @@ import { validate, ValidationError } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
 @Injectable()
-export class ValidationPipe implements PipeTransform<any> {
+export class ValidationPipe<K> implements PipeTransform<K> {
   async transform<T>(value: T, { metatype }: ArgumentMetadata) {
     if (value instanceof Object && this.isEmpty(value)) {
       throw new HttpException(
