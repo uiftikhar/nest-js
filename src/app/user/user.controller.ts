@@ -9,6 +9,7 @@ import {
 import { UserService } from './user.service';
 import { UserDto } from './user.dto';
 import { ValidationPipe } from '../shared/validation.pipe';
+
 import { AuthGuard } from '../shared/guards/auth.guard';
 
 @Controller()
