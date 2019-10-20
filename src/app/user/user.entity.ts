@@ -3,12 +3,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { UserResponseDto } from './user-response.dto';
+import { IdeaEntity } from '../idea/idea.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -27,6 +29,9 @@ export class UserEntity {
   @Column('text')
   password: string;
 
+  @OneToMany(type => IdeaEntity, idea => idea.author)
+  ideas: IdeaEntity[];
+
   @BeforeInsert()
   async hashPassword() {
     const PASSWORD_SALT = 10;
@@ -38,6 +43,9 @@ export class UserEntity {
     const responseObject: UserResponseDto = { id, created, username };
     if (showToken) {
       responseObject.token = token;
+    }
+    if (this.ideas) {
+      responseObject.ideas = this.ideas;
     }
     return responseObject;
   }

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Post,
   Put,
@@ -13,6 +14,7 @@ import { IdeaService } from './idea.service';
 import { IdeaDto } from './idea.dto';
 import { ValidationPipe } from '../shared/validation.pipe';
 import { AuthGuard } from '../shared/guards/auth.guard';
+import { User } from '../user/user.decorator';
 
 @Controller('api/ideas')
 export class IdeaController {
@@ -24,9 +26,10 @@ export class IdeaController {
   }
 
   @Post()
+  @UseGuards(new AuthGuard())
   @UsePipes(new ValidationPipe())
-  async createIdea(@Body() data: IdeaDto) {
-    return this.ideaService.create(data);
+  async createIdea(@User('id') userId, @Body() data: IdeaDto) {
+    return this.ideaService.create(userId, data);
   }
 
   @Get(':id')
@@ -35,16 +38,22 @@ export class IdeaController {
   }
 
   @Put(':id')
+  @UseGuards(new AuthGuard())
   @UsePipes(new ValidationPipe())
   async updateIdea(
+    @User('id') userId: string,
     @Param('id') id: string,
     @Body() data: Partial<IdeaDto>
   ) {
-    return this.ideaService.update(id, data);
+    return this.ideaService.update(id, userId, data);
   }
 
   @Delete(':id')
-  async deleteIdea(@Param('id') id: string) {
-    return this.ideaService.destroy(id);
+  @UseGuards(new AuthGuard())
+  async deleteIdea(
+    @Param('id') id: string,
+    @User('id') userId: string
+  ) {
+    return this.ideaService.destroy(id, userId);
   }
 }

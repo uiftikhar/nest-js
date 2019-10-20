@@ -17,7 +17,6 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('api/users')
-  @UseGuards(new AuthGuard())
   async showAllUsers() {
     return this.userService.showAll();
   }
