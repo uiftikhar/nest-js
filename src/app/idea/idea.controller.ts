@@ -74,4 +74,19 @@ export class IdeaController {
   ) {
     return this.ideaService.removeBookmark(id, userId);
   }
+
+  @Post(':id/upvote')
+  @UseGuards(new AuthGuard())
+  async upvote(@Param('id') id: string, @User('id') userId: string) {
+    return this.ideaService.upvote(id, userId);
+  }
+
+  @Post(':id/downvote')
+  @UseGuards(new AuthGuard())
+  async downvote(
+    @Param('id') id: string,
+    @User('id') userId: string
+  ) {
+    return this.ideaService.downvote(id, userId);
+  }
 }

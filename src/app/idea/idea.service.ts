@@ -2,7 +2,6 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
-  Logger,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 
@@ -11,6 +10,7 @@ import { IdeaEntity } from './idea.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../user/user.entity';
 import { IdeaResponseDto } from './idea-response.dto';
+import { Votes } from '../shared/enums/votes.enum';
 
 @Injectable()
 export class IdeaService {
@@ -76,7 +76,7 @@ export class IdeaService {
     try {
       const idea = await this.ideaRepository.findOneOrFail({
         where: { id },
-        relations: ['author'],
+        relations: ['author', 'upvotes', 'downvotes'],
       });
       return this.toResponseObject(idea);
     } catch (exception) {
@@ -218,5 +218,92 @@ export class IdeaService {
     }
 
     return user.toResponseObject(false);
+  }
+
+  async upvote(id: string, userId: string) {
+    let idea = await this.ideaRepository.findOne({
+      where: { id },
+      relations: ['author', 'upvotes', 'downvotes'],
+    });
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    idea = await this._vote(idea, user, Votes.UP);
+    return this.toResponseObject(idea);
+  }
+
+  async downvote(id: string, userId: string) {
+    let idea = await this.ideaRepository.findOne({
+      where: { id },
+      relations: ['author', 'upvotes', 'downvotes'],
+    });
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    idea = await this._vote(idea, user, Votes.DOWN);
+    return this.toResponseObject(idea);
+  }
+
+  private async _vote(
+    idea: IdeaEntity,
+    user: UserEntity,
+    vote: Votes
+  ) {
+    const oppositeCurrentVote =
+      vote === Votes.UP ? Votes.DOWN : Votes.UP;
+
+    if (
+      this.isIdeaAlreadyVoted(idea, user, vote) ||
+      this.isVoteFromUser(idea, user, oppositeCurrentVote)
+    ) {
+      idea[oppositeCurrentVote] = idea[oppositeCurrentVote].filter(
+        voter => voter.id !== user.id
+      );
+      idea[vote] = idea[vote].filter(voter => voter.id !== user.id);
+
+      await this.ideaRepository.save(idea).catch(() => {
+        throw new HttpException(
+          'Unable to cast vote',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      });
+    } else if (!this.isIdeaAlreadyVoted(idea, user, vote)) {
+      idea[vote].push(user);
+
+      await this.ideaRepository.save(idea).catch(() => {
+        throw new HttpException(
+          'Unable to cast vote',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      });
+    } else {
+      throw new HttpException(
+        'Unable to cast vote',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+    return idea;
+  }
+
+  private isVoteFromUser(
+    idea: IdeaEntity,
+    user: UserEntity,
+    oppositeCurrentVote: Votes
+  ) {
+    return idea[oppositeCurrentVote].find(
+      voter => voter.id === user.id
+    );
+  }
+
+  private isIdeaAlreadyVoted(
+    idea: IdeaEntity,
+    user: UserEntity,
+    vote: Votes
+  ) {
+    return idea[vote].find(voter => voter.id === user.id);
   }
 }

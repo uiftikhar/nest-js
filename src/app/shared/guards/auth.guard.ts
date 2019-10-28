@@ -22,6 +22,8 @@ export class AuthGuard implements CanActivate {
     if (!request.headers.authorization) {
       return false;
     }
+
+    // Add user property to the request for the User Decorator
     request.user = await this.validateRequest(request);
     return true;
   }
