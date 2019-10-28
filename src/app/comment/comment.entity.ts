@@ -18,9 +18,6 @@ export class CommentEntity {
   @CreateDateColumn()
   created: Date;
 
-  @UpdateDateColumn()
-  updated: Date;
-
   @Column('text')
   comment: string;
 

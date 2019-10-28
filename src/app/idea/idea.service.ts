@@ -69,6 +69,7 @@ export class IdeaService {
       author: idea.author
         ? idea.author.toResponseObject(false)
         : null,
+      comments: idea.comments ? idea.comments : '',
     };
   }
 
