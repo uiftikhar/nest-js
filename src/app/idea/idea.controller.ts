@@ -56,4 +56,22 @@ export class IdeaController {
   ) {
     return this.ideaService.destroy(id, userId);
   }
+
+  @Post(':id/bookmark')
+  @UseGuards(new AuthGuard())
+  async bookmarkIdea(
+    @Param('id') id: string,
+    @User('id') userId: string
+  ) {
+    return this.ideaService.bookmark(id, userId);
+  }
+
+  @Delete(':id/bookmark')
+  @UseGuards(new AuthGuard())
+  async removeBookmarkIdea(
+    @Param('id') id: string,
+    @User('id') userId: string
+  ) {
+    return this.ideaService.removeBookmark(id, userId);
+  }
 }

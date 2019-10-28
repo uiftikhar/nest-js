@@ -25,7 +25,7 @@ export class IdeaService {
     let ideas: IdeaEntity[];
     try {
       ideas = await this.ideaRepository.find({
-        relations: ['author'],
+        relations: ['author', 'upvotes', 'downvotes'],
       });
       return ideas.map(idea => this.toResponseObject(idea));
     } catch (e) {
@@ -64,6 +64,8 @@ export class IdeaService {
   private toResponseObject(idea: IdeaEntity): IdeaResponseDto {
     return {
       ...idea,
+      upvotes: idea.upvotes ? idea.upvotes.length : 0,
+      downvotes: idea.downvotes ? idea.downvotes.length : 0,
       author: idea.author
         ? idea.author.toResponseObject(false)
         : null,
@@ -140,5 +142,81 @@ export class IdeaService {
         HttpStatus.UNAUTHORIZED
       );
     }
+  }
+
+  async bookmark(id: string, userId: string) {
+    const idea = await this.ideaRepository
+      .findOne({ where: { id } })
+      .catch(() => {
+        throw new HttpException(
+          'Idea Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
+
+    const user = await this.userRepository
+      .findOne({ where: { id: userId }, relations: ['bookmarks'] })
+      .catch(() => {
+        throw new HttpException(
+          'User Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
+
+    if (!user.bookmarks.find(bookmark => bookmark.id === idea.id)) {
+      user.bookmarks.push(idea);
+      await this.userRepository.save(user).catch(() => {
+        throw new HttpException(
+          'User Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
+    } else {
+      throw new HttpException(
+        'Idea already bookmarked',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    return user.toResponseObject(false);
+  }
+
+  async removeBookmark(id: string, userId: string) {
+    const idea = await this.ideaRepository
+      .findOne({ where: { id } })
+      .catch(() => {
+        throw new HttpException(
+          'Idea Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
+
+    const user = await this.userRepository
+      .findOne({ where: { id: userId }, relations: ['bookmarks'] })
+      .catch(() => {
+        throw new HttpException(
+          'User Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
+
+    if (user.bookmarks.find(bookmark => bookmark.id === idea.id)) {
+      user.bookmarks = user.bookmarks.filter(
+        bmark => bmark.id !== idea.id
+      );
+      await this.userRepository.save(user).catch(() => {
+        throw new HttpException(
+          'User Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
+    } else {
+      throw new HttpException(
+        'Idea Not bookmarked already',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    return user.toResponseObject(false);
   }
 }
