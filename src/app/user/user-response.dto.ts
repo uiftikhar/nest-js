@@ -6,4 +6,5 @@ export class UserResponseDto {
   username: string;
   token?: string;
   ideas?: IdeaEntity[];
+  bookmarks?: IdeaEntity[];
 }
