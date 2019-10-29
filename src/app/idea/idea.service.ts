@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../user/user.entity';
 import { IdeaResponseDto } from './idea-response.dto';
 import { Votes } from '../shared/enums/votes.enum';
+import { CommentEntity } from '../comment/comment.entity';
 
 @Injectable()
 export class IdeaService {
@@ -23,19 +24,17 @@ export class IdeaService {
 
   async showAll(): Promise<IdeaResponseDto[]> {
     let ideas: IdeaEntity[];
-    try {
-      ideas = await this.ideaRepository.find({
+    ideas = await this.ideaRepository
+      .find({
         relations: ['author', 'upvotes', 'downvotes', 'comments'],
-      });
-      return ideas.map(idea => this.toResponseObject(idea));
-    } catch (e) {
-      if (!ideas) {
+      })
+      .catch(() => {
         throw new HttpException(
-          'No Content found: ',
+          'No Content found',
           HttpStatus.NO_CONTENT
         );
-      }
-    }
+      });
+    return ideas.map(idea => this.toResponseObject(idea));
   }
 
   async create(
@@ -44,21 +43,31 @@ export class IdeaService {
   ): Promise<IdeaResponseDto> {
     let user: UserEntity;
     let idea: IdeaEntity;
-    try {
-      user = await this.userRepository.findOne({
+    user = await this.userRepository
+      .findOne({
         where: { id: userId },
+      })
+      .catch(() => {
+        throw new HttpException(
+          'No User found',
+          HttpStatus.FORBIDDEN
+        );
       });
-      idea = await this.ideaRepository.create({
-        ...data,
-        author: user,
-      });
-      await this.ideaRepository.save(idea);
-      return this.toResponseObject(idea);
-    } catch (e) {
-      if (!user) {
-        throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-      }
-    }
+    idea = await this.ideaRepository.create({
+      ...data,
+      author: user,
+    });
+    await this.ideaRepository.save(idea).catch(() => {
+      throw new HttpException(
+        'Error saving idea',
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return this.toResponseObject(idea);
+  }
+
+  private formatComments(comments: CommentEntity[]) {
+    return comments.map(comment => comment.comment);
   }
 
   private toResponseObject(idea: IdeaEntity): IdeaResponseDto {
@@ -69,20 +78,22 @@ export class IdeaService {
       author: idea.author
         ? idea.author.toResponseObject(false)
         : null,
-      comments: idea.comments ? idea.comments : '',
+      comments: idea.comments
+        ? this.formatComments(idea.comments)
+        : [],
     };
   }
 
   async readIdea(id: string): Promise<IdeaResponseDto> {
-    try {
-      const idea = await this.ideaRepository.findOneOrFail({
+    const idea = await this.ideaRepository
+      .findOneOrFail({
         where: { id },
         relations: ['author', 'upvotes', 'downvotes', 'comments'],
+      })
+      .catch(() => {
+        throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       });
-      return this.toResponseObject(idea);
-    } catch (exception) {
-      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
-    }
+    return this.toResponseObject(idea);
   }
 
   async update(
@@ -90,50 +101,48 @@ export class IdeaService {
     userId: string,
     data: Partial<IdeaDto>
   ): Promise<IdeaResponseDto> {
-    let idea;
-    let update;
-    try {
-      idea = await this.ideaRepository.findOne({
+    const idea = await this.ideaRepository
+      .findOne({
         where: { id },
         relations: ['author', 'comments'],
-      });
-      this.ensureOwnership(idea, userId);
-      update = await this.ideaRepository.update({ id }, data);
-      return { ...idea, ...data };
-    } catch (e) {
-      if (!idea) {
+      })
+      .catch(() => {
         throw new HttpException(
           'Not Found: Could not find item to update',
           HttpStatus.NOT_FOUND
         );
-      }
-      if (!update) {
-        throw new HttpException(
-          'Error performing update',
-          HttpStatus.BAD_REQUEST
-        );
-      }
-    }
+      });
+    this.ensureOwnership(idea, userId);
+    await this.ideaRepository.update({ id }, data).catch(() => {
+      throw new HttpException(
+        'Error performing update',
+        HttpStatus.BAD_REQUEST
+      );
+    });
+
+    return this.toResponseObject(idea);
   }
 
   async destroy(id: string, userId: string) {
-    let idea: IdeaEntity;
-    try {
-      idea = await this.ideaRepository.findOne({
+    const idea = await this.ideaRepository
+      .findOne({
         where: { id },
         relations: ['author', 'comments'],
-      });
-      this.ensureOwnership(idea, userId);
-      await this.ideaRepository.delete({ id });
-      return {
-        deleted: true,
-        ...this.toResponseObject(idea),
-      };
-    } catch (e) {
-      if (!idea) {
+      })
+      .catch(() => {
         throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
-      }
-    }
+      });
+    this.ensureOwnership(idea, userId);
+    await this.ideaRepository.delete({ id }).catch(() => {
+      throw new HttpException(
+        'Unable to delete',
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return {
+      deleted: true,
+      ...this.toResponseObject(idea),
+    };
   }
 
   private ensureOwnership(idea: IdeaEntity, userId: string) {

@@ -18,62 +18,61 @@ export class UserService {
   ) {}
 
   async showAll(): Promise<UserResponseDto[]> {
-    const users = await this.userRepository.find({
-      relations: ['ideas', 'bookmarks'],
-    });
+    const users = await this.userRepository
+      .find({
+        relations: ['ideas', 'bookmarks'],
+      })
+      .catch(() => {
+        throw new HttpException(
+          'Users Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
     return users.map(user => user.toResponseObject(false));
   }
 
   async login(data: UserDto): Promise<UserResponseDto> {
-    let user: UserEntity;
-    let comparePass: boolean;
     const { password, username } = data;
-    try {
-      user = await this.userRepository.findOne({
+    const user = await this.userRepository
+      .findOne({
         where: { username },
+      })
+      .catch(() => {
+        throw new HttpException(
+          'Users Not Found',
+          HttpStatus.NOT_FOUND
+        );
       });
-      comparePass = await user.comparePassword(password);
-      if (!comparePass) {
-        throw new HttpException(
-          'Invalid username/password',
-          HttpStatus.BAD_REQUEST
-        );
-      }
-      return user.toResponseObject();
-    } catch (e) {
-      if (!user) {
-        throw new HttpException(
-          'Invalid username/password',
-          HttpStatus.BAD_REQUEST
-        );
-      }
-    }
+    await user.comparePassword(password).catch(() => {
+      throw new HttpException(
+        'Invalid username/password',
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return user.toResponseObject();
   }
 
   async register(data: UserDto): Promise<UserResponseDto> {
-    let isExistingUser: UserEntity;
     let newUser: UserEntity;
-    try {
-      const { username } = data;
-      isExistingUser = await this.userRepository.findOne({
+    const { username } = data;
+    await this.userRepository
+      .findOne({
         where: { username },
-      });
-      newUser = await this.userRepository.create(data);
-      newUser = await this.userRepository.save(newUser);
-      return newUser.toResponseObject();
-    } catch (e) {
-      if (isExistingUser) {
+      })
+      .catch(() => {
         throw new HttpException(
           'User already exists',
           HttpStatus.BAD_REQUEST
         );
-      }
-      if (!newUser) {
-        throw new HttpException(
-          'Bad Request: Error creating user',
-          HttpStatus.BAD_REQUEST
-        );
-      }
-    }
+      });
+
+    newUser = await this.userRepository.create(data);
+    newUser = await this.userRepository.save(newUser).catch(() => {
+      throw new HttpException(
+        'Bad Request: Error creating user',
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return newUser.toResponseObject();
   }
 }

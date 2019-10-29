@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../user/user.entity';
 import { IdeaEntity } from '../idea/idea.entity';
 import { CommentDto } from './comment.dto';
+import { CommentResponseDto } from './comment.response.dto';
 
 @Injectable()
 export class CommentService {
@@ -23,16 +24,18 @@ export class CommentService {
     private readonly ideaRepository: Repository<IdeaEntity>
   ) {}
 
-  private toResponseObject(comment: CommentEntity) {
-    const responseObject: any = comment;
-    if (comment.author) {
-      responseObject.author = comment.author.toResponseObject(false);
-    }
-
-    return responseObject;
+  private toResponseObject(
+    comment: CommentEntity
+  ): CommentResponseDto {
+    return {
+      ...comment,
+      author: comment.author
+        ? comment.author.toResponseObject(false)
+        : null,
+    };
   }
 
-  async showByIdeaId(id: string) {
+  async showByIdeaId(id: string): Promise<CommentResponseDto[]> {
     const idea = await this.ideaRepository
       .findOne({
         where: { id },
@@ -49,7 +52,7 @@ export class CommentService {
     );
   }
 
-  async showByUserId(id: string) {
+  async showByUserId(id: string): Promise<CommentResponseDto[]> {
     const comments = await this.commentRepository.find({
       where: { author: { id } },
       relations: ['author'],
@@ -58,7 +61,7 @@ export class CommentService {
     return comments.map(comment => this.toResponseObject(comment));
   }
 
-  async show(id: string) {
+  async show(id: string): Promise<CommentResponseDto> {
     const comment = await this.commentRepository
       .findOne({ where: { id }, relations: ['author', 'idea'] })
       .catch(() => {
@@ -71,7 +74,11 @@ export class CommentService {
     return this.toResponseObject(comment);
   }
 
-  async create(ideaId: string, userId: string, data: CommentDto) {
+  async create(
+    ideaId: string,
+    userId: string,
+    data: CommentDto
+  ): Promise<CommentResponseDto> {
     const idea = await this.ideaRepository
       .findOne({ where: { id: ideaId } })
       .catch(() => {
@@ -106,7 +113,13 @@ export class CommentService {
     return this.toResponseObject(comment);
   }
 
-  async destroy(id: string, userId: string) {
+  async destroy(
+    id: string,
+    userId: string
+  ): Promise<{
+    comment: CommentResponseDto;
+    deleted: boolean;
+  }> {
     const comment = await this.commentRepository
       .findOne({
         where: { id },
