@@ -6,6 +6,7 @@ import {
   Logger,
   Param,
   Post,
+  Query,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -20,13 +21,19 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Get('idea/:id')
-  async showCommentsByIdea(@Param('id') id: string) {
-    return this.commentService.showByIdeaId(id);
+  async showCommentsByIdea(
+    @Param('id') id: string,
+    @Query('page') page: number
+  ) {
+    return this.commentService.showByIdeaId(id, page);
   }
 
   @Get('user/:id')
-  async showCommentsByUser(@Param('id') id: string) {
-    return this.commentService.showByUserId(id);
+  async showCommentsByUser(
+    @Param('id') id: string,
+    @Query('page') page: number
+  ) {
+    return this.commentService.showByUserId(id, page);
   }
 
   @Get(':id')

@@ -12,6 +12,7 @@ import { UserEntity } from '../user/user.entity';
 import { IdeaEntity } from '../idea/idea.entity';
 import { CommentDto } from './comment.dto';
 import { CommentResponseDto } from './comment.response.dto';
+import { MAX_OPTIONS_PER_PAGE } from '../shared/constants/MAX_OPTIONS_PER_PAGE';
 
 @Injectable()
 export class CommentService {
@@ -35,28 +36,44 @@ export class CommentService {
     };
   }
 
-  async showByIdeaId(id: string): Promise<CommentResponseDto[]> {
-    const idea = await this.ideaRepository
-      .findOne({
-        where: { id },
-        relations: ['comments', 'comments.author', 'comments.idea'],
+  async showByIdeaId(
+    id: string,
+    page: number = 1
+  ): Promise<CommentResponseDto[]> {
+    const comments = await this.commentRepository
+      .find({
+        where: { idea: { id } },
+        relations: ['author'],
+        take: MAX_OPTIONS_PER_PAGE,
+        skip: MAX_OPTIONS_PER_PAGE * (page - 1),
       })
       .catch(() => {
         throw new HttpException(
-          'Idea not found',
+          'User not found',
           HttpStatus.NOT_FOUND
         );
       });
-    return idea.comments.map(comment =>
-      this.toResponseObject(comment)
-    );
+
+    return comments.map(comment => this.toResponseObject(comment));
   }
 
-  async showByUserId(id: string): Promise<CommentResponseDto[]> {
-    const comments = await this.commentRepository.find({
-      where: { author: { id } },
-      relations: ['author'],
-    });
+  async showByUserId(
+    id: string,
+    page: number = 1
+  ): Promise<CommentResponseDto[]> {
+    const comments = await this.commentRepository
+      .find({
+        where: { author: { id } },
+        relations: ['author'],
+        take: MAX_OPTIONS_PER_PAGE,
+        skip: MAX_OPTIONS_PER_PAGE * (page - 1),
+      })
+      .catch(() => {
+        throw new HttpException(
+          'User not found',
+          HttpStatus.NOT_FOUND
+        );
+      });
 
     return comments.map(comment => this.toResponseObject(comment));
   }

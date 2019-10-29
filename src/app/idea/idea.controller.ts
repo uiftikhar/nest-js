@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -21,8 +22,13 @@ export class IdeaController {
   constructor(private readonly ideaService: IdeaService) {}
 
   @Get()
-  async showAllIdeas() {
-    return this.ideaService.showAll();
+  async showAllIdeas(@Query('page') page: number) {
+    return this.ideaService.showAll(page);
+  }
+
+  @Get('/latest')
+  async showLatestIdeas(@Query('page') page: number) {
+    return this.ideaService.showAll(page, true);
   }
 
   @Post()
