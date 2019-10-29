@@ -24,7 +24,7 @@ const generateUser = async () => {
 
 const postNewIdea = async token => {
   const idea = await generateIdea();
-  const data = axios.post(
+  const { data } = axios.post(
     `${IDEA_API}/api/ideas`,
     {
       idea,
@@ -35,7 +35,6 @@ const postNewIdea = async token => {
     }
   );
 
-  console.log(data);
   return idea;
 };
 
