@@ -25,7 +25,7 @@ export class IdeaService {
     let ideas: IdeaEntity[];
     try {
       ideas = await this.ideaRepository.find({
-        relations: ['author', 'upvotes', 'downvotes'],
+        relations: ['author', 'upvotes', 'downvotes', 'comments'],
       });
       return ideas.map(idea => this.toResponseObject(idea));
     } catch (e) {
@@ -69,6 +69,7 @@ export class IdeaService {
       author: idea.author
         ? idea.author.toResponseObject(false)
         : null,
+      comments: idea.comments ? idea.comments : '',
     };
   }
 
@@ -76,7 +77,7 @@ export class IdeaService {
     try {
       const idea = await this.ideaRepository.findOneOrFail({
         where: { id },
-        relations: ['author', 'upvotes', 'downvotes'],
+        relations: ['author', 'upvotes', 'downvotes', 'comments'],
       });
       return this.toResponseObject(idea);
     } catch (exception) {
@@ -94,7 +95,7 @@ export class IdeaService {
     try {
       idea = await this.ideaRepository.findOne({
         where: { id },
-        relations: ['author'],
+        relations: ['author', 'comments'],
       });
       this.ensureOwnership(idea, userId);
       update = await this.ideaRepository.update({ id }, data);
@@ -120,7 +121,7 @@ export class IdeaService {
     try {
       idea = await this.ideaRepository.findOne({
         where: { id },
-        relations: ['author'],
+        relations: ['author', 'comments'],
       });
       this.ensureOwnership(idea, userId);
       await this.ideaRepository.delete({ id });
@@ -223,7 +224,7 @@ export class IdeaService {
   async upvote(id: string, userId: string) {
     let idea = await this.ideaRepository.findOne({
       where: { id },
-      relations: ['author', 'upvotes', 'downvotes'],
+      relations: ['author', 'upvotes', 'downvotes', 'comments'],
     });
 
     const user = await this.userRepository.findOne({
@@ -237,7 +238,7 @@ export class IdeaService {
   async downvote(id: string, userId: string) {
     let idea = await this.ideaRepository.findOne({
       where: { id },
-      relations: ['author', 'upvotes', 'downvotes'],
+      relations: ['author', 'upvotes', 'downvotes', 'comments'],
     });
 
     const user = await this.userRepository.findOne({
