@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../user/user.entity';
 import { IdeaResponseDto } from './idea-response.dto';
 import { Votes } from '../shared/enums/votes.enum';
+import { CommentEntity } from '../comment/comment.entity';
 
 @Injectable()
 export class IdeaService {
@@ -65,6 +66,10 @@ export class IdeaService {
     return this.toResponseObject(idea);
   }
 
+  private formatComments(comments: CommentEntity[]) {
+    return comments.map(comment => comment.comment);
+  }
+
   private toResponseObject(idea: IdeaEntity): IdeaResponseDto {
     return {
       ...idea,
@@ -73,7 +78,9 @@ export class IdeaService {
       author: idea.author
         ? idea.author.toResponseObject(false)
         : null,
-      comments: idea.comments ? idea.comments : '',
+      comments: idea.comments
+        ? this.formatComments(idea.comments)
+        : [],
     };
   }
 
