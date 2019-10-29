@@ -23,7 +23,16 @@ export class CommentService {
     private readonly ideaRepository: Repository<IdeaEntity>
   ) {}
 
-  async showById(id: string) {
+  private toResponseObject(comment: CommentEntity) {
+    const responseObject: any = comment;
+    if (comment.author) {
+      responseObject.author = comment.author.toResponseObject(false);
+    }
+
+    return responseObject;
+  }
+
+  async showByIdeaId(id: string) {
     const idea = await this.ideaRepository
       .findOne({
         where: { id },
@@ -35,15 +44,18 @@ export class CommentService {
           HttpStatus.NOT_FOUND
         );
       });
-    return idea.comments;
+    return idea.comments.map(comment =>
+      this.toResponseObject(comment)
+    );
   }
 
-  async showByUser(id: string) {
-    const comments = this.commentRepository.find({
+  async showByUserId(id: string) {
+    const comments = await this.commentRepository.find({
       where: { author: { id } },
+      relations: ['author'],
     });
 
-    return comments;
+    return comments.map(comment => this.toResponseObject(comment));
   }
 
   async show(id: string) {
@@ -56,7 +68,7 @@ export class CommentService {
         );
       });
 
-    return comment;
+    return this.toResponseObject(comment);
   }
 
   async create(ideaId: string, userId: string, data: CommentDto) {
@@ -81,21 +93,17 @@ export class CommentService {
     const comment = await this.commentRepository.create({
       ...data,
       idea,
-      author: user,
+      author: user.toResponseObject(false),
     });
 
-    Logger.log(
-      `LOLOLOLOLOLOLOOLOL12${idea}, ${user}, ${data.comments}`
-    );
+    await this.commentRepository.save(comment).catch(() => {
+      throw new HttpException(
+        'error saving comment',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    });
 
-    // await this.commentRepository.save(comment).catch(() => {
-    //   throw new HttpException(
-    //     'error saving comment',
-    //     HttpStatus.INTERNAL_SERVER_ERROR,
-    //   );
-    // });
-
-    return comment;
+    return this.toResponseObject(comment);
   }
 
   async destroy(id: string, userId: string) {
@@ -119,6 +127,6 @@ export class CommentService {
     }
 
     this.commentRepository.remove(comment);
-    return { ...comment, deleted: true };
+    return { comment: this.toResponseObject(comment), deleted: true };
   }
 }

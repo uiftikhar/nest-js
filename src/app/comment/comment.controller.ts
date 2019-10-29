@@ -21,15 +21,15 @@ export class CommentController {
 
   @Get('idea/:id')
   async showCommentsByIdea(@Param('id') id: string) {
-    return this.commentService.showById(id);
+    return this.commentService.showByIdeaId(id);
   }
 
   @Get('user/:id')
   async showCommentsByUser(@Param('id') id: string) {
-    return this.commentService.showByUser(id);
+    return this.commentService.showByUserId(id);
   }
 
-  @Get()
+  @Get(':id')
   async showComment(@Param('id') id: string) {
     return this.commentService.show(id);
   }
@@ -51,9 +51,6 @@ export class CommentController {
     @User('id') user: string,
     @Body() data: CommentDto
   ) {
-    Logger.log(
-      `LOLOLOLOLOLOLOOLOL12${idea}, ${user}, ${data.comments}`
-    );
     return this.commentService.create(idea, user, data);
   }
 }
