@@ -8,8 +8,9 @@ export class IdeaResponseDto {
   updated: Date;
   idea: string;
   description: string;
-  author: UserResponseDto;
-  upvotes?: number;
-  downvotes?: number;
+  author: UserResponseDto | UserEntity;
+  // TODO remove userEntity array?
+  upvotes?: number | UserEntity[];
+  downvotes?: number | UserEntity[];
   comments?: string | CommentEntity[];
 }
