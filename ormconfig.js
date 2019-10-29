@@ -9,7 +9,7 @@ module.exports = {
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
   synchronize: true,
-  dropSchema: true,
+  dropSchema: false,
   logging: true,
   entities: ['dist/**/*.entity.js'],
 };
