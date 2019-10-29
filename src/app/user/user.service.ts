@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { UserDto } from './user.dto';
 import { UserResponseDto } from './user-response.dto';
+import { MAX_OPTIONS_PER_PAGE } from '../shared/constants/MAX_OPTIONS_PER_PAGE';
 
 @Injectable()
 export class UserService {
@@ -17,10 +18,12 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>
   ) {}
 
-  async showAll(): Promise<UserResponseDto[]> {
+  async showAll(page: number = 1): Promise<UserResponseDto[]> {
     const users = await this.userRepository
       .find({
         relations: ['ideas', 'bookmarks'],
+        take: MAX_OPTIONS_PER_PAGE,
+        skip: MAX_OPTIONS_PER_PAGE * (page - 1),
       })
       .catch(() => {
         throw new HttpException(

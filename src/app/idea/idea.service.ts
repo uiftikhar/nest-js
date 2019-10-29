@@ -12,6 +12,7 @@ import { UserEntity } from '../user/user.entity';
 import { IdeaResponseDto } from './idea-response.dto';
 import { Votes } from '../shared/enums/votes.enum';
 import { CommentEntity } from '../comment/comment.entity';
+import { MAX_OPTIONS_PER_PAGE } from '../shared/constants/MAX_OPTIONS_PER_PAGE';
 
 @Injectable()
 export class IdeaService {
@@ -22,11 +23,17 @@ export class IdeaService {
     private readonly userRepository: Repository<UserEntity>
   ) {}
 
-  async showAll(): Promise<IdeaResponseDto[]> {
+  async showAll(
+    page: number = 1,
+    latest?: boolean
+  ): Promise<IdeaResponseDto[]> {
     let ideas: IdeaEntity[];
     ideas = await this.ideaRepository
       .find({
         relations: ['author', 'upvotes', 'downvotes', 'comments'],
+        take: MAX_OPTIONS_PER_PAGE,
+        skip: MAX_OPTIONS_PER_PAGE * (page - 1),
+        order: latest && { created: 'DESC' },
       })
       .catch(() => {
         throw new HttpException(
