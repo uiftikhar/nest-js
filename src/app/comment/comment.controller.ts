@@ -58,6 +58,9 @@ export class CommentController {
     @User('id') user: string,
     @Body() data: CommentDto
   ) {
+    Logger.log(
+      `LOLOL 1: IDEA:${idea}\n, USER:${user}\n,DATA:${data.comment}`
+    );
     return this.commentService.create(idea, user, data);
   }
 }
