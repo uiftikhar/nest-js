@@ -37,29 +37,30 @@ export class UserService {
   async login(data: UserDto): Promise<UserResponseDto> {
     const { password, username } = data;
     const user = await this.userRepository
-      .findOne({
+      .findOneOrFail({
         where: { username },
       })
       .catch(() => {
         throw new HttpException(
-          'Users Not Found',
+          'User Not Found',
           HttpStatus.NOT_FOUND
         );
       });
+
     await user.comparePassword(password).catch(() => {
       throw new HttpException(
         'Invalid username/password',
         HttpStatus.BAD_REQUEST
       );
     });
-    return user.toResponseObject();
+    return user.toResponseObject(true);
   }
 
   async register(data: UserDto): Promise<UserResponseDto> {
     let newUser: UserEntity;
     const { username } = data;
     await this.userRepository
-      .findOne({
+      .findOneOrFail({
         where: { username },
       })
       .catch(() => {
@@ -76,6 +77,6 @@ export class UserService {
         HttpStatus.BAD_REQUEST
       );
     });
-    return newUser.toResponseObject();
+    return newUser.toResponseObject(true);
   }
 }

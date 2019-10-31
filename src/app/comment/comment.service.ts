@@ -31,7 +31,7 @@ export class CommentService {
     return {
       ...comment,
       author: comment.author
-        ? comment.author.toResponseObject(false)
+        ? comment.author.toResponseObject()
         : null,
     };
   }
@@ -80,7 +80,7 @@ export class CommentService {
 
   async show(id: string): Promise<CommentResponseDto> {
     const comment = await this.commentRepository
-      .findOne({ where: { id }, relations: ['author', 'idea'] })
+      .findOneOrFail({ where: { id }, relations: ['author', 'idea'] })
       .catch(() => {
         throw new HttpException(
           'comment not found',
@@ -97,7 +97,7 @@ export class CommentService {
     data: CommentDto
   ): Promise<CommentResponseDto> {
     const idea = await this.ideaRepository
-      .findOne({ where: { id: ideaId } })
+      .findOneOrFail({ where: { id: ideaId } })
       .catch(() => {
         throw new HttpException(
           'no idea found',
@@ -106,7 +106,7 @@ export class CommentService {
       });
 
     const user = await this.userRepository
-      .findOne({ where: { id: userId } })
+      .findOneOrFail({ where: { id: userId } })
       .catch(() => {
         throw new HttpException(
           'no user found',
@@ -117,7 +117,7 @@ export class CommentService {
     const comment = await this.commentRepository.create({
       ...data,
       idea,
-      author: user.toResponseObject(false),
+      author: user,
     });
 
     await this.commentRepository.save(comment).catch(() => {
@@ -138,7 +138,7 @@ export class CommentService {
     deleted: boolean;
   }> {
     const comment = await this.commentRepository
-      .findOne({
+      .findOneOrFail({
         where: { id },
         relations: ['author', 'idea'],
       })

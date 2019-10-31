@@ -13,6 +13,7 @@ import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { UserResponseDto } from './user-response.dto';
 import { IdeaEntity } from '../idea/idea.entity';
+import { IdeaResponseDto } from '../idea/idea-response.dto';
 
 @Entity('user')
 export class UserEntity {
@@ -44,19 +45,29 @@ export class UserEntity {
     this.password = await bcrypt.hash(this.password, PASSWORD_SALT);
   }
 
-  toResponseObject(showToken: boolean = true) {
-    const { id, created, username, token } = this;
-    const responseObject: UserResponseDto = { id, created, username };
+  toResponseObject(showToken: boolean = false): UserResponseDto {
+    const responseObject: UserResponseDto = {
+      id: this.id,
+      created: this.created,
+      username: this.username,
+    };
+
     if (showToken) {
-      responseObject.token = token;
+      responseObject.token = this.token;
     }
+
     if (this.ideas) {
-      responseObject.ideas = this.ideas;
+      responseObject.ideas = this.ideas.map(idea =>
+        idea.toResponseObject(idea)
+      );
     }
 
     if (this.bookmarks) {
-      responseObject.bookmarks = this.bookmarks;
+      responseObject.bookmarks = this.bookmarks.map(bookmark =>
+        bookmark.toResponseObject(bookmark)
+      );
     }
+
     return responseObject;
   }
 
