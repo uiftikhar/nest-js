@@ -12,19 +12,31 @@ const generateIdea = async () => {
   return data.replace(/\n/g, '');
 };
 
+const addCommentToIdea = async (ideaId, token) => {
+  const { data } = await axios.post(
+    `${IDEA_API}/api/comments/idea/${ideaId}`,
+    {
+      comment: faker.lorem.paragraph(),
+    },
+    {
+      headers: { authorization: `Bearer ${token}` },
+    }
+  );
+  return data;
+};
+
 const generateUser = async () => {
   const { data } = await axios.post(`${IDEA_API}/register`, {
     username: faker.internet.userName(),
     password: 'password',
   });
 
-  console.log(data);
   return data.token;
 };
 
 const postNewIdea = async token => {
   const idea = await generateIdea();
-  const { data } = axios.post(
+  const { data } = await axios.post(
     `${IDEA_API}/api/ideas`,
     {
       idea,
@@ -35,7 +47,7 @@ const postNewIdea = async token => {
     }
   );
 
-  return idea;
+  return { idea, data: data };
 };
 
 (async () => {
@@ -46,7 +58,10 @@ const postNewIdea = async token => {
   for (let i = 0; i < randNumUsers; i++) {
     const token = await generateUser();
     for (let j = 0; j < randNumIdeas; j++) {
-      const idea = await postNewIdea(token);
+      const { idea, data } = await postNewIdea(token);
+      const id = data.id;
+      const test = await addCommentToIdea(id, token);
+      console.log('idea ID: ', id, '\ncomment: ', test.comment, '\n');
     }
   }
 })();
