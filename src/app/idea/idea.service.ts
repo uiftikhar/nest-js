@@ -50,16 +50,14 @@ export class IdeaService {
   ): Promise<IdeaResponseDto> {
     let user: UserEntity;
     let idea: IdeaEntity;
-    user = await this.userRepository
-      .findOne({
-        where: { id: userId },
-      })
-      .catch(() => {
-        throw new HttpException(
-          'No User found',
-          HttpStatus.FORBIDDEN
-        );
-      });
+    user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new HttpException('No User found', HttpStatus.FORBIDDEN);
+    }
+
     idea = await this.ideaRepository.create({
       ...data,
       author: user,
@@ -82,9 +80,7 @@ export class IdeaService {
       ...idea,
       upvotes: idea.upvotes ? idea.upvotes.length : 0,
       downvotes: idea.downvotes ? idea.downvotes.length : 0,
-      author: idea.author
-        ? idea.author.toResponseObject(false)
-        : null,
+      author: idea.author ? idea.author.toResponseObject() : null,
       comments: idea.comments
         ? this.formatComments(idea.comments)
         : [],
@@ -109,7 +105,7 @@ export class IdeaService {
     data: Partial<IdeaDto>
   ): Promise<IdeaResponseDto> {
     const idea = await this.ideaRepository
-      .findOne({
+      .findOneOrFail({
         where: { id },
         relations: ['author', 'comments'],
       })
@@ -132,7 +128,7 @@ export class IdeaService {
 
   async destroy(id: string, userId: string) {
     const idea = await this.ideaRepository
-      .findOne({
+      .findOneOrFail({
         where: { id },
         relations: ['author', 'comments'],
       })
@@ -163,7 +159,7 @@ export class IdeaService {
 
   async bookmark(id: string, userId: string) {
     const idea = await this.ideaRepository
-      .findOne({ where: { id } })
+      .findOneOrFail({ where: { id } })
       .catch(() => {
         throw new HttpException(
           'Idea Not Found',
@@ -172,7 +168,10 @@ export class IdeaService {
       });
 
     const user = await this.userRepository
-      .findOne({ where: { id: userId }, relations: ['bookmarks'] })
+      .findOneOrFail({
+        where: { id: userId },
+        relations: ['bookmarks'],
+      })
       .catch(() => {
         throw new HttpException(
           'User Not Found',
@@ -195,12 +194,12 @@ export class IdeaService {
       );
     }
 
-    return user.toResponseObject(false);
+    return user.toResponseObject();
   }
 
   async removeBookmark(id: string, userId: string) {
     const idea = await this.ideaRepository
-      .findOne({ where: { id } })
+      .findOneOrFail({ where: { id } })
       .catch(() => {
         throw new HttpException(
           'Idea Not Found',
@@ -209,7 +208,10 @@ export class IdeaService {
       });
 
     const user = await this.userRepository
-      .findOne({ where: { id: userId }, relations: ['bookmarks'] })
+      .findOneOrFail({
+        where: { id: userId },
+        relations: ['bookmarks'],
+      })
       .catch(() => {
         throw new HttpException(
           'User Not Found',
@@ -221,6 +223,7 @@ export class IdeaService {
       user.bookmarks = user.bookmarks.filter(
         bmark => bmark.id !== idea.id
       );
+
       await this.userRepository.save(user).catch(() => {
         throw new HttpException(
           'User Not Found',
@@ -234,32 +237,60 @@ export class IdeaService {
       );
     }
 
-    return user.toResponseObject(false);
+    return user.toResponseObject();
   }
 
   async upvote(id: string, userId: string) {
-    let idea = await this.ideaRepository.findOne({
-      where: { id },
-      relations: ['author', 'upvotes', 'downvotes', 'comments'],
-    });
+    let idea = await this.ideaRepository
+      .findOneOrFail({
+        where: { id },
+        relations: ['author', 'upvotes', 'downvotes', 'comments'],
+      })
+      .catch(() => {
+        throw new HttpException(
+          'Idea Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
+    const user = await this.userRepository
+      .findOneOrFail({
+        where: { id: userId },
+      })
+      .catch(() => {
+        throw new HttpException(
+          'User Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
 
     idea = await this._vote(idea, user, Votes.UP);
     return this.toResponseObject(idea);
   }
 
   async downvote(id: string, userId: string) {
-    let idea = await this.ideaRepository.findOne({
-      where: { id },
-      relations: ['author', 'upvotes', 'downvotes', 'comments'],
-    });
+    let idea = await this.ideaRepository
+      .findOneOrFail({
+        where: { id },
+        relations: ['author', 'upvotes', 'downvotes', 'comments'],
+      })
+      .catch(() => {
+        throw new HttpException(
+          'Idea Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
+    const user = await this.userRepository
+      .findOneOrFail({
+        where: { id: userId },
+      })
+      .catch(() => {
+        throw new HttpException(
+          'User Not Found',
+          HttpStatus.NOT_FOUND
+        );
+      });
 
     idea = await this._vote(idea, user, Votes.DOWN);
     return this.toResponseObject(idea);
