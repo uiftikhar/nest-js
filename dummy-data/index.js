@@ -47,7 +47,7 @@ const postNewIdea = async token => {
     }
   );
 
-  return { idea, data: data };
+  return { idea, data };
 };
 
 (async () => {
