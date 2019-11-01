@@ -47,15 +47,25 @@ export class IdeaEntity {
   comments: CommentEntity[];
 
   toResponseObject(idea: IdeaEntity): IdeaResponseDto {
-    return {
-      ...idea,
+    const responseObj: IdeaResponseDto = {
+      id: idea.id,
+      created: idea.created,
+      updated: idea.updated,
+      idea: idea.idea,
+      description: idea.description,
       upvotes: idea.upvotes ? idea.upvotes.length : 0,
       downvotes: idea.downvotes ? idea.downvotes.length : 0,
-      author: idea.author ? idea.author.toResponseObject() : null,
-      comments: idea.comments
-        ? this.formatComments(idea.comments)
-        : [],
     };
+
+    if (idea.author) {
+      responseObj.author = idea.author.toResponseObject();
+    }
+
+    if (idea.comments) {
+      responseObj.comments = this.formatComments(idea.comments);
+    }
+
+    return responseObj;
   }
 
   private formatComments(comments: CommentEntity[]) {

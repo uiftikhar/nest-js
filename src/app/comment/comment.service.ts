@@ -33,6 +33,7 @@ export class CommentService {
       author: comment.author
         ? comment.author.toResponseObject()
         : null,
+      idea: comment.idea.toResponseObject(comment.idea),
     };
   }
 

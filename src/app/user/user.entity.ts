@@ -57,15 +57,16 @@ export class UserEntity {
     }
 
     if (this.ideas) {
-      responseObject.ideas = this.ideas.map(idea =>
-        idea.toResponseObject(idea)
-      );
+      responseObject.ideas = this.ideas.map(idea => {
+        return idea.toResponseObject(idea);
+      });
     }
 
     if (this.bookmarks) {
       responseObject.bookmarks = this.bookmarks.map(bookmark =>
         bookmark.toResponseObject(bookmark)
       );
+      console.log('BOOKAMRKS', responseObject.bookmarks);
     }
 
     return responseObject;

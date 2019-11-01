@@ -50,16 +50,14 @@ export class IdeaService {
   ): Promise<IdeaResponseDto> {
     let user: UserEntity;
     let idea: IdeaEntity;
-    user = await this.userRepository
-      .findOneOrFail({
-        where: { id: userId },
-      })
-      .catch(() => {
-        throw new HttpException(
-          'No User found',
-          HttpStatus.FORBIDDEN
-        );
-      });
+    user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new HttpException('No User found', HttpStatus.FORBIDDEN);
+    }
+
     idea = await this.ideaRepository.create({
       ...data,
       author: user,
@@ -225,6 +223,7 @@ export class IdeaService {
       user.bookmarks = user.bookmarks.filter(
         bmark => bmark.id !== idea.id
       );
+
       await this.userRepository.save(user).catch(() => {
         throw new HttpException(
           'User Not Found',

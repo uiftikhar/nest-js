@@ -31,6 +31,7 @@ export class UserService {
           HttpStatus.NOT_FOUND
         );
       });
+
     return users.map(user => user.toResponseObject(false));
   }
 
@@ -59,16 +60,15 @@ export class UserService {
   async register(data: UserDto): Promise<UserResponseDto> {
     let newUser: UserEntity;
     const { username } = data;
-    await this.userRepository
-      .findOneOrFail({
-        where: { username },
-      })
-      .catch(() => {
-        throw new HttpException(
-          'User already exists',
-          HttpStatus.BAD_REQUEST
-        );
-      });
+    const user = await this.userRepository.findOne({
+      where: { username },
+    });
+    if (user) {
+      throw new HttpException(
+        'User already exists',
+        HttpStatus.BAD_REQUEST
+      );
+    }
 
     newUser = await this.userRepository.create(data);
     newUser = await this.userRepository.save(newUser).catch(() => {
