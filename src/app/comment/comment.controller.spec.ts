@@ -55,27 +55,39 @@ describe('Comment Controller', () => {
   });
 
   describe('showCommentsByIdea', () => {
-    it('should show all comments by Idea Id', async () => {
-      const result: Partial<CommentResponseDto[]> = [
+    it('should show all comments by Idea Id', async done => {
+      const result: CommentResponseDto[] = [
         {
-          comment: 'Shyann.Schmitt',
+          id: '6fedac2f-ec25-433f-97c8-7efa41618733',
+          created: new Date(Date.now()),
+          comment:
+            'Placeat aut et consequatur. Id deserunt similique minima eos quia nemo eum ipsam. Officiis sit praesentium tempora voluptatum aperiam pariatur. Consequatur quae mollitia a eum aut.',
           author: {
-            id: 'e2bf1abc-bbb8-4e2c-8a97-2d514c564992',
+            id: '8abf1263-a32e-4c53-ad0b-bfbeaf332da0',
             created: new Date(Date.now()),
-            username: 'Shyann.Schmitt',
+            username: 'Gladys71',
           },
           idea: {
-            id: '32a9e308-abd9-4259-8b34-521e2a29ab13',
-            idea: 'Periscope for truck drivers',
-            description:
-              'Autem id voluptas sed eum voluptas aperiam consequatur tempore. Dicta ad rerum nobis accusantium molestiae mollitia. Et qui praesentium eligendi aut suscipit.',
+            id: 'a4f99d92-72f2-460c-a14d-dda2c6298b58',
             created: new Date(Date.now()),
             updated: new Date(Date.now()),
+            idea: 'Instagram for attending meetups',
+            description:
+              'Aliquid veniam laudantium qui ad. Eos neque at voluptatem neque quibusdam qui. Ea corrupti quod occaecati vitae sit.',
+            upvotes: 0,
+            downvotes: 0,
           },
-          id: '25cbcfdb-4e3c-4008-b356-3463127c7503',
-          created: new Date(Date.now()),
         },
       ];
+
+      jest
+        .spyOn(commentService, 'showByIdeaId')
+        .mockImplementation(() => Promise.resolve(result));
+
+      expect(await controller.showCommentsByIdea('id', 2)).toBe(
+        result
+      );
+      done();
     });
   });
 });
