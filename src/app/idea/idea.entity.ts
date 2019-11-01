@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from '../user/user.entity';
 import { CommentEntity } from '../comment/comment.entity';
+import { IdeaResponseDto } from './idea-response.dto';
 
 @Entity('idea')
 export class IdeaEntity {
@@ -44,4 +45,30 @@ export class IdeaEntity {
     cascade: true,
   })
   comments: CommentEntity[];
+
+  toResponseObject(idea: IdeaEntity): IdeaResponseDto {
+    const responseObj: IdeaResponseDto = {
+      id: idea.id,
+      created: idea.created,
+      updated: idea.updated,
+      idea: idea.idea,
+      description: idea.description,
+      upvotes: idea.upvotes ? idea.upvotes.length : 0,
+      downvotes: idea.downvotes ? idea.downvotes.length : 0,
+    };
+
+    if (idea.author) {
+      responseObj.author = idea.author.toResponseObject();
+    }
+
+    if (idea.comments) {
+      responseObj.comments = this.formatComments(idea.comments);
+    }
+
+    return responseObj;
+  }
+
+  private formatComments(comments: CommentEntity[]) {
+    return comments.map(comment => comment.comment);
+  }
 }

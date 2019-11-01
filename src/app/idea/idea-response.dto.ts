@@ -6,7 +6,7 @@ export class IdeaResponseDto {
   updated: Date;
   idea: string;
   description: string;
-  author: UserResponseDto;
+  author?: UserResponseDto;
   upvotes?: number;
   downvotes?: number;
   comments?: string[];
