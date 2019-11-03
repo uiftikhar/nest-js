@@ -67,7 +67,7 @@ export class CommentService {
     const comments = await this.commentRepository
       .find({
         where: { author: { id } },
-        relations: ['author'],
+        relations: ['author', 'idea'],
         take: MAX_OPTIONS_PER_PAGE,
         skip: MAX_OPTIONS_PER_PAGE * (page - 1),
       })
