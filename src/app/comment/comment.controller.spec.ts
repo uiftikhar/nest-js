@@ -11,9 +11,9 @@ import { CommentResponseDto } from './comment.response.dto';
 describe('Comment Controller', () => {
   let controller: CommentController;
   let commentService: CommentService;
-  let commentRepo: Repository<CommentEntity>;
-  let userRepo: Repository<UserEntity>;
-  let ideaRepo: Repository<IdeaEntity>;
+  let commentRepository: Repository<CommentEntity>;
+  let userRepository: Repository<UserEntity>;
+  let ideaRepository: Repository<IdeaEntity>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,13 +39,13 @@ describe('Comment Controller', () => {
 
     commentService = module.get<CommentService>(CommentService);
 
-    commentRepo = module.get<Repository<CommentEntity>>(
+    commentRepository = module.get<Repository<CommentEntity>>(
       getRepositoryToken(CommentEntity)
     );
-    userRepo = module.get<Repository<UserEntity>>(
+    userRepository = module.get<Repository<UserEntity>>(
       getRepositoryToken(UserEntity)
     );
-    ideaRepo = module.get<Repository<IdeaEntity>>(
+    ideaRepository = module.get<Repository<IdeaEntity>>(
       getRepositoryToken(IdeaEntity)
     );
   });
