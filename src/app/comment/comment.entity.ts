@@ -23,8 +23,8 @@ export class CommentEntity {
 
   @ManyToOne(type => UserEntity)
   @JoinTable()
-  author: UserEntity;
+  author: Partial<UserEntity>;
 
   @ManyToOne(type => IdeaEntity, idea => idea.comments)
-  idea: IdeaEntity;
+  idea: Partial<IdeaEntity>;
 }

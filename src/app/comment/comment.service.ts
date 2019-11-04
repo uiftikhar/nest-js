@@ -57,6 +57,7 @@ export class CommentService {
         );
       });
 
+    console.log(comments);
     return comments.map(comment => this.toResponseObject(comment));
   }
 
