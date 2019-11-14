@@ -9,6 +9,73 @@ import { IdeaEntity } from '../idea/idea.entity';
 import { CommentResponseDto } from './comment.response.dto';
 
 describe('CommentService', () => {
+  const sharedDate = new Date(Date.now());
+  const commentEntityMock: Partial<CommentEntity[]> = [
+    {
+      id: 'ae563ab0-dfd4-4811-b10e-69ca0477070d',
+      created: sharedDate,
+      comment: 'test comment 1',
+      author: {
+        id: '5f098a64-81c5-462a-9633-2327091c1fb6',
+        created: sharedDate,
+        username: 'Jeanette_Batz95',
+        toResponseObject: () => ({
+          id: '5f098a64-81c5-462a-9633-2327091c1fb6',
+          created: sharedDate,
+          username: 'Jeanette_Batz95',
+        }),
+      },
+      idea: {
+        id: '006f9ef6-68f5-44e5-9e03-02ea51aee58b',
+        idea: 'Yelp for sharing content',
+        description:
+          'Nisi sequi et a asperiores velit dolores libero autem aut. Qui est iure enim numquam neque architecto magnam. Voluptatem eius sit illo recusandae odit eum. Omnis sed sed accusamus dolor commodi dolorem repellendus quaerat velit. Laborum nostrum velit eius sunt. Ea rerum nihil incidunt saepe rem nemo ut.',
+        created: sharedDate,
+        updated: sharedDate,
+        toResponseObject: () => ({
+          id: '006f9ef6-68f5-44e5-9e03-02ea51aee58b',
+          created: sharedDate,
+          updated: sharedDate,
+          idea: `Yelp for sharing content`,
+          description: `Nisi sequi et a asperiores velit dolores libero autem aut.
+               Qui est iure enim numquam neque architecto magnam. 
+               Voluptatem eius sit illo recusandae odit eum. Omnis sed 
+               sed accusamus dolor commodi dolorem repellendus quaerat
+               velit. Laborum nostrum velit eius sunt. Ea rerum nihil
+               incidunt saepe rem nemo ut.`,
+          upvotes: 0,
+          downvotes: 0,
+        }),
+      },
+    },
+  ];
+  const commentResponse: CommentResponseDto[] = [
+    {
+      id: 'ae563ab0-dfd4-4811-b10e-69ca0477070d',
+      created: sharedDate,
+      comment: 'test comment 1',
+      author: {
+        id: '5f098a64-81c5-462a-9633-2327091c1fb6',
+        created: sharedDate,
+        username: 'Jeanette_Batz95',
+      },
+      idea: {
+        id: '006f9ef6-68f5-44e5-9e03-02ea51aee58b',
+        created: sharedDate,
+        updated: sharedDate,
+        idea: `Yelp for sharing content`,
+        description: `Nisi sequi et a asperiores velit dolores libero autem aut.
+               Qui est iure enim numquam neque architecto magnam. 
+               Voluptatem eius sit illo recusandae odit eum. Omnis sed 
+               sed accusamus dolor commodi dolorem repellendus quaerat
+               velit. Laborum nostrum velit eius sunt. Ea rerum nihil
+               incidunt saepe rem nemo ut.`,
+        upvotes: 0,
+        downvotes: 0,
+      },
+    },
+  ];
+
   let service: CommentService;
   let commentRepository: Repository<CommentEntity>;
   let userRepository: Repository<UserEntity>;
@@ -21,7 +88,7 @@ describe('CommentService', () => {
         {
           provide: getRepositoryToken(CommentEntity),
           useFactory: () => ({
-            find: jest.fn(() => true),
+            find: jest.fn(() => Promise.resolve(commentEntityMock)),
             findOneOrFail: jest.fn(() => true),
             create: jest.fn(() => true),
             save: jest.fn(() => true),
@@ -44,6 +111,7 @@ describe('CommentService', () => {
     }).compile();
 
     service = module.get<CommentService>(CommentService);
+
     commentRepository = module.get<Repository<CommentEntity>>(
       getRepositoryToken(CommentEntity)
     );
@@ -60,83 +128,19 @@ describe('CommentService', () => {
   });
 
   describe('showByIdeaId', () => {
-    it('should show comment by Idea ID', () => {
-      const commentEntityMock: Partial<CommentEntity[]> = [
-        {
-          id: 'ae563ab0-dfd4-4811-b10e-69ca0477070d',
-          created: new Date(Date.now()),
-          comment: 'test comment 1',
-          author: {
-            id: '5f098a64-81c5-462a-9633-2327091c1fb6',
-            created: new Date(Date.now()),
-            username: 'Jeanette_Batz95',
-            password:
-              '$2a$10$/nnTladXXM8hQtKI1jtC0OHYGnXdI.8ljzjI5DRr8Me1AXLRWOLES',
-          },
-          idea: {
-            id: '006f9ef6-68f5-44e5-9e03-02ea51aee58b',
-            idea: 'Yelp for sharing content',
-            description:
-              'Nisi sequi et a asperiores velit dolores libero autem aut. Qui est iure enim numquam neque architecto magnam. Voluptatem eius sit illo recusandae odit eum. Omnis sed sed accusamus dolor commodi dolorem repellendus quaerat velit. Laborum nostrum velit eius sunt. Ea rerum nihil incidunt saepe rem nemo ut.',
-            created: new Date(Date.now()),
-            updated: new Date(Date.now()),
-          },
-        },
-      ];
-      const commentResponse: CommentResponseDto[] = [
-        {
-          id: 'ae563ab0-dfd4-4811-b10e-69ca0477070d',
-          created: new Date(Date.now()),
-          comment: 'test comment 1',
-          author: {
-            id: '5f098a64-81c5-462a-9633-2327091c1fb6',
-            created: new Date(Date.now()),
-            username: 'Jeanette_Batz95',
-          },
-          idea: {
-            id: '006f9ef6-68f5-44e5-9e03-02ea51aee58b',
-            created: new Date(Date.now()),
-            updated: new Date(Date.now()),
-            idea: `Yelp for sharing content`,
-            description: `Nisi sequi et a asperiores velit dolores libero autem aut.
-               Qui est iure enim numquam neque architecto magnam. 
-               Voluptatem eius sit illo recusandae odit eum. Omnis sed 
-               sed accusamus dolor commodi dolorem repellendus quaerat
-               velit. Laborum nostrum velit eius sunt. Ea rerum nihil
-               incidunt saepe rem nemo ut.`,
-            upvotes: 0,
-            downvotes: 0,
-          },
-        },
-        {
-          id: `fefbd76b-b758-476a-a7a6-5ebd8c012445`,
-          created: new Date(Date.now()),
-          comment: `test comment 4`,
-          author: {
-            id: `5f098a64-81c5-462a-9633-2327091c1fb6`,
-            created: new Date(Date.now()),
-            username: `Jeanette_Batz95`,
-          },
-          idea: {
-            id: `006f9ef6-68f5-44e5-9e03-02ea51aee58b`,
-            created: new Date(Date.now()),
-            updated: new Date(Date.now()),
-            idea: `Yelp for sharing content`,
-            description: `Nisi sequi et a asperiores velit dolores libero
-             autem aut. Qui est iure enim numquam neque architecto magnam.
-              Voluptatem eius sit illo recusandae odit eum. Omnis sed sed 
-              accusamus dolor commodi dolorem repellendus quaerat velit. 
-              Laborum nostrum velit eius sunt. Ea rerum nihil incidunt 
-              saepe rem nemo ut.`,
-            upvotes: 0,
-            downvotes: 0,
-          },
-        },
-      ];
-
-      jest
+    it('should show comment by Idea ID', async done => {
+      /*     jest
         .spyOn(commentRepository, 'find')
-        .mockImplementation(() => Promise.resolve(commentEntityMock));
+        .mockImplementation(() => Promise.resolve(commentEntityMock));*/
+
+      expect(await commentRepository.find()).toBe(commentEntityMock);
+      expect(
+        await service.showByIdeaId(
+          '006f9ef6-68f5-44e5-9e03-02ea51aee58b',
+          1
+        )
+      ).toStrictEqual(commentResponse);
+      done();
     });
   });
 });

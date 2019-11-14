@@ -46,7 +46,7 @@ export class IdeaEntity {
   })
   comments: CommentEntity[];
 
-  toResponseObject(idea: IdeaEntity): IdeaResponseDto {
+  toResponseObject(idea: Partial<IdeaEntity>): IdeaResponseDto {
     const responseObj: IdeaResponseDto = {
       id: idea.id,
       created: idea.created,
