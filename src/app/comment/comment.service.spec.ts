@@ -7,6 +7,7 @@ import { CommentEntity } from './comment.entity';
 import { UserEntity } from '../user/user.entity';
 import { IdeaEntity } from '../idea/idea.entity';
 import { CommentResponseDto } from './comment.response.dto';
+import { MAX_OPTIONS_PER_PAGE } from '../shared/constants/MAX_OPTIONS_PER_PAGE';
 
 describe('CommentService', () => {
   const sharedDate = new Date(Date.now());
@@ -129,17 +130,38 @@ describe('CommentService', () => {
 
   describe('showByIdeaId', () => {
     it('should show comment by Idea ID', async done => {
-      /*     jest
-        .spyOn(commentRepository, 'find')
-        .mockImplementation(() => Promise.resolve(commentEntityMock));*/
+      const mockId = '006f9ef6-68f5-44e5-9e03-02ea51aee58b';
+      const page = 1;
+      expect(await service.showByIdeaId(mockId, page)).toStrictEqual(
+        commentResponse
+      );
 
+      expect(commentRepository.find).toBeCalledWith({
+        where: { idea: { id: mockId } },
+        relations: ['author', 'idea'],
+        take: MAX_OPTIONS_PER_PAGE,
+        skip: MAX_OPTIONS_PER_PAGE * (page - 1),
+      });
       expect(await commentRepository.find()).toBe(commentEntityMock);
-      expect(
-        await service.showByIdeaId(
-          '006f9ef6-68f5-44e5-9e03-02ea51aee58b',
-          1
-        )
-      ).toStrictEqual(commentResponse);
+      done();
+    });
+  });
+
+  describe('showByUserId', () => {
+    it('should show comment by Idea ID', async done => {
+      const mockId = '006f9ef6-68f5-44e5-9e03-02ea51aee58b';
+      const page = 1;
+      expect(await service.showByIdeaId(mockId, page)).toStrictEqual(
+        commentResponse
+      );
+
+      expect(commentRepository.find).toBeCalledWith({
+        where: { idea: { id: mockId } },
+        relations: ['author', 'idea'],
+        take: MAX_OPTIONS_PER_PAGE,
+        skip: MAX_OPTIONS_PER_PAGE * (page - 1),
+      });
+      expect(await commentRepository.find()).toBe(commentEntityMock);
       done();
     });
   });
