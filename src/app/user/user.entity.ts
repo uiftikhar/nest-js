@@ -66,7 +66,6 @@ export class UserEntity {
       responseObject.bookmarks = this.bookmarks.map(bookmark =>
         bookmark.toResponseObject(bookmark)
       );
-      console.log('BOOKAMRKS', responseObject.bookmarks);
     }
 
     return responseObject;

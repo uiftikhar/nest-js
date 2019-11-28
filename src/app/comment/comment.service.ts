@@ -33,7 +33,9 @@ export class CommentService {
       author: comment.author
         ? comment.author.toResponseObject()
         : null,
-      idea: comment.idea.toResponseObject(comment.idea),
+      idea: comment.idea
+        ? comment.idea.toResponseObject(comment.idea)
+        : null,
     };
   }
 
@@ -44,7 +46,7 @@ export class CommentService {
     const comments = await this.commentRepository
       .find({
         where: { idea: { id } },
-        relations: ['author'],
+        relations: ['author', 'idea'],
         take: MAX_OPTIONS_PER_PAGE,
         skip: MAX_OPTIONS_PER_PAGE * (page - 1),
       })
@@ -65,7 +67,7 @@ export class CommentService {
     const comments = await this.commentRepository
       .find({
         where: { author: { id } },
-        relations: ['author'],
+        relations: ['author', 'idea'],
         take: MAX_OPTIONS_PER_PAGE,
         skip: MAX_OPTIONS_PER_PAGE * (page - 1),
       })
@@ -115,7 +117,7 @@ export class CommentService {
         );
       });
 
-    const comment = await this.commentRepository.create({
+    const comment = this.commentRepository.create({
       ...data,
       idea,
       author: user,

@@ -46,7 +46,7 @@ export class IdeaEntity {
   })
   comments: CommentEntity[];
 
-  toResponseObject(idea: IdeaEntity): IdeaResponseDto {
+  toResponseObject(idea: Partial<IdeaEntity>): IdeaResponseDto {
     const responseObj: IdeaResponseDto = {
       id: idea.id,
       created: idea.created,
@@ -62,13 +62,11 @@ export class IdeaEntity {
     }
 
     if (idea.comments) {
-      responseObj.comments = this.formatComments(idea.comments);
+      responseObj.comments = idea.comments.map(
+        comment => comment.comment
+      );
     }
 
     return responseObj;
-  }
-
-  private formatComments(comments: CommentEntity[]) {
-    return comments.map(comment => comment.comment);
   }
 }
