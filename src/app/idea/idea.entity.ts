@@ -62,13 +62,11 @@ export class IdeaEntity {
     }
 
     if (idea.comments) {
-      responseObj.comments = this.formatComments(idea.comments);
+      responseObj.comments = idea.comments.map(
+        comment => comment.comment
+      );
     }
 
     return responseObj;
-  }
-
-  private formatComments(comments: CommentEntity[]) {
-    return comments.map(comment => comment.comment);
   }
 }

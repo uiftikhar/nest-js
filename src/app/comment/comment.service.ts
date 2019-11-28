@@ -117,7 +117,7 @@ export class CommentService {
         );
       });
 
-    const comment = await this.commentRepository.create({
+    const comment = this.commentRepository.create({
       ...data,
       idea,
       author: user,
